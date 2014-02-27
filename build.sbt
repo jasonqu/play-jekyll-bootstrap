@@ -1,11 +1,12 @@
 name := "play-jekyll-bootstrap"
 
-version := "1.0-SNAPSHOT"
+version := "0.1-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   jdbc,
   anorm,
-  cache
+  cache,
+  "org.pegdown" % "pegdown" % "1.4.2"
 )     
 
 play.Project.playScalaSettings
