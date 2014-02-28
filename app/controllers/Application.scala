@@ -2,9 +2,10 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-
 import models.Post
 import org.joda.time.DateTime
+import util.markdown.PegDown._
+import org.joda.time.format.DateTimeFormat
 
 object Application extends Controller {
   import java.io.File
@@ -14,7 +15,7 @@ object Application extends Controller {
   }
   
   def index = Action {
-    val postFiles = recursiveListFiles(new File("_posts")).filterNot(_.isDirectory)
+    val postFiles = recursiveListFiles(new File("_content/_posts")).filterNot(_.isDirectory)
     val posts = postFiles.map { file =>
       Post(
         "title",
@@ -23,17 +24,11 @@ object Application extends Controller {
         new DateTime(),
         "content")
     }
-    
-//    import org.pegdown.PegDownProcessor      
-//    val pro = new PegDownProcessor()
-//    val lines = scala.io.Source.fromFile(new File("_page/index.md")).getLines().toList
-//    val md = lines.drop(1).dropWhile{!_.startsWith("---")}
-    
     Ok(views.html.index("")(posts))
   }
 
   def post(id: String) = Action {
-    val postFiles = recursiveListFiles(new File("_posts"))
+    val postFiles = recursiveListFiles(new File("_content/_posts"))
       .filterNot(_.isDirectory)
       .filter(_.getName().equals(id))
       
@@ -42,21 +37,17 @@ object Application extends Controller {
     }
     
     val posts = Some(postFiles(0)).map { file =>
-      import org.pegdown.PegDownProcessor      
-      val pro = new PegDownProcessor()
-      val lines = scala.io.Source.fromFile(file).getLines().toList
-      //val content = lines.mkString
+      val (metadata, content) = processMdFile(file)
       
-      //lines.s
-      val (metadata, md) = lines.drop(1).span{!_.startsWith("---")}
-      
+      val date = try { DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(file.getName().substring(0, 10))
+      } catch {case _ => new DateTime(file.lastModified()) }
       
       Post(
-        "title",
-        "tagline",
+        metadata.getOrElse("title", "title"),
+        metadata.getOrElse("tagline", "tagline"),
         file.getName(),
-        new DateTime(),
-        pro.markdownToHtml(md.drop(1).mkString("\n")))
+        date,
+        content)
     }
     Ok(views.html.post(posts.get))
 //    posts match {
