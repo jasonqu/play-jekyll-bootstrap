@@ -10,3 +10,5 @@ libraryDependencies ++= Seq(
 )     
 
 play.Project.playScalaSettings
+
+templatesImport += "org.joda.time._"
