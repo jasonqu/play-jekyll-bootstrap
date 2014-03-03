@@ -3,10 +3,6 @@ package util.markdown
 import java.io.File
 import org.pegdown.PegDownProcessor
 
-class PegDown {
-
-}
-
 /**
  * process file with metadata in the head
  */

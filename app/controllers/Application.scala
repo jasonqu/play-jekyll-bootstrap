@@ -33,7 +33,7 @@ object Application extends Controller {
         date,
         content)
     }
-    posts
+    posts.sortWith((a, b) => a.date.isAfter(b.date))
   }
   
   def index = Action {
@@ -71,5 +71,22 @@ object Application extends Controller {
       }
     }
     Ok(views.html.pages.tags(mm))
+  }
+  
+  def atom = Action {
+    Ok(util.xml.Xml.atom(getPosts())).as("text/xml")
+  }
+  
+  def rss = Action {
+    Ok(util.xml.Xml.rss(getPosts())).as("text/xml")
+  }
+
+  import play.api.Play.current
+  def sitemap = Action {
+    val pages = "archive.html" :: "atom.xml" :: "categories.html" :: "index.html" :: "pages.html" :: "rss.xml" :: "sitemap.txt" :: "tags.html" :: Nil
+    val ps = pages.map { current.configuration.getString("production_url").get + "/" + _ +"\n" }.mkString
+
+    val pts = getPosts().map { current.configuration.getString("production_url").get + "/post/" + _.name }.mkString("\n")
+    Ok(ps + "\n" + pts).as("text/plain")
   }
 }
