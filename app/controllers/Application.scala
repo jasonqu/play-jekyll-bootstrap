@@ -6,6 +6,7 @@ import models.Post
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import util.markdown.PegDown._
+import play.api.i18n.Messages
 
 object Application extends Controller {
   import java.io.File
@@ -20,7 +21,7 @@ object Application extends Controller {
       val (metadata, content) = processMdFile(file)
       
       val date = try { DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(file.getName().substring(0, 10))
-      } catch {case _ => new DateTime(file.lastModified()) }
+      } catch {case _ : Throwable => new DateTime(file.lastModified()) }
       
       Post(
         metadata.getOrElse("title", "no title"),
@@ -84,9 +85,9 @@ object Application extends Controller {
   import play.api.Play.current
   def sitemap = Action {
     val pages = "archive.html" :: "atom.xml" :: "categories.html" :: "index.html" :: "pages.html" :: "rss.xml" :: "sitemap.txt" :: "tags.html" :: Nil
-    val ps = pages.map { current.configuration.getString("production_url").get + "/" + _ +"\n" }.mkString
+    val ps = pages.map { Messages("production_url") + "/" + _ +"\n" }.mkString
 
-    val pts = getPosts().map { current.configuration.getString("production_url").get + "/post/" + _.name }.mkString("\n")
+    val pts = getPosts().map { Messages("production_url") + "/post/" + _.name }.mkString("\n")
     Ok(ps + "\n" + pts).as("text/plain")
   }
 }

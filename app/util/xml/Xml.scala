@@ -2,6 +2,7 @@ package util.xml
 
 import models.Post
 import play.api.Play.current
+import play.api.i18n.Messages
 
 object Xml {
   def atomPost(post: Post) = {
@@ -9,7 +10,7 @@ object Xml {
       <title>{ post.title }</title>
       <link href="/post/{post.name}"/>
       <updated>{ post.date }</updated>
-      <id>{ current.configuration.getString("production_url") }/post/{ post.name }</id>
+      <id>{ Messages("production_url") }/post/{ post.name }</id>
       <content type="html">{ post.html }</content>
     </entry>
   }
@@ -17,14 +18,14 @@ object Xml {
   def atom(posts: Array[models.Post]) = {
     <?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom">
-      <title>{ current.configuration.getString("siteTitle") }</title>
-      <link href={ current.configuration.getString("production_url") + "/atom.xml" } rel="self"/>
-      <link href={ current.configuration.getString("production_url") + ""}/>
+      <title>{ Messages("site.title") }</title>
+      <link href={ Messages("production_url") + "/atom.xml" } rel="self"/>
+      <link href={ Messages("production_url") + ""}/>
       <updated>site.time</updated>
-      <id>{ current.configuration.getString("production_url") }</id>
+      <id>{ Messages("production_url") }</id>
       <author>
-        <name>{ current.configuration.getString("author.name") }</name>
-        <email>{ current.configuration.getString("author.email") }</email>
+        <name>{ Messages("author.name") }</name>
+        <email>{ Messages("author.email") }</email>
       </author>
       {for (post <- posts) yield {atomPost(post)}}
     </feed>
@@ -34,8 +35,8 @@ object Xml {
     <item>
       <title>{ post.title }</title>
       <description>{ post.html }</description>
-      <link>{ current.configuration.getString("production_url") + "/post/" + post.name }</link>
-      <guid>{ current.configuration.getString("production_url") + "/post/" + post.name }</guid>
+      <link>{ Messages("production_url") + "/post/" + post.name }</link>
+      <guid>{ Messages("production_url") + "/post/" + post.name }</guid>
       <pubDate>{ post.date }</pubDate>
     </item>
   }
@@ -43,10 +44,10 @@ object Xml {
   def rss(posts: Array[models.Post]) = {
     <rss version="2.0">
       <channel>
-        <title>{ current.configuration.getString("siteTitle") }</title>
-        <description>{ current.configuration.getString("siteTitle") } - { current.configuration.getString("author.name") }</description>
-        <link>{ current.configuration.getString("production_url") + "" }/rss.xml</link>
-        <link>{ current.configuration.getString("production_url") + "" }</link>
+        <title>{ Messages("site.title") }</title>
+        <description>{ Messages("site.title") } - { Messages("author.name") }</description>
+        <link>{ Messages("production_url") + "" }/rss.xml</link>
+        <link>{ Messages("production_url") + "" }</link>
         <lastBuildDate>site.time</lastBuildDate>
         <pubDate>site.time</pubDate>
         <ttl>1800</ttl>
